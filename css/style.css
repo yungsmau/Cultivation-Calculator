@@ -41,7 +41,7 @@ body {
 }
 .brand { font-size: 16px; font-weight: 600; padding: 0 6px; }
 
-.content { min-width: 0; max-width: 1360px; width: 100%; padding: 32px 40px 48px; }
+.content { min-width: 0; max-width: 1800px; margin: 0 auto; width: 100%; padding: 32px 40px 48px; container-type: inline-size;}
 .pagehead { margin-bottom: 24px; }
 .pagehead h1 { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -.01em; }
 .pagehead p { margin: 6px 0 0; color: var(--ink-3); max-width: 760px; }
@@ -144,7 +144,7 @@ svg { stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round
 .kpi .v { margin-top: 4px; font-size: 28px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
 
 /* ---------- панели и таблица ---------- */
-.panel { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-xs); }
+.panel { min-width: 0; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-xs); }
 .panel-head { padding: 18px 20px; border-bottom: 1px solid var(--line); }
 .panel-head h2 { margin: 0; font-size: 16px; font-weight: 600; }
 .panel-body { padding: 16px 20px 20px; }
@@ -164,21 +164,24 @@ svg { stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round
 .footnote { margin: 0; color: var(--ink-3); font-size: 13px; max-width: 760px; }
 
 /* ---------- адаптив ---------- */
-@media (max-width: 1200px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr;}}
+/* по ширине контента (окно минус сайдбар), а не окна */
+@container (max-width: 1280px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 940px)  { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+@container (max-width: 560px)  { .kpis { grid-template-columns: minmax(0, 1fr); } }
+
+/* по ширине окна: сайдбар уходит наверх */
 @media (max-width: 900px) {
   .shell { grid-template-columns: 1fr; }
   .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
   .content { padding: 24px 16px 40px; }
-  .kpis { grid-template-columns: 1fr; }
 }
 
 /* ---------- графики ---------- */
 .hidden { display: none !important; }
 .section-title { margin: 8px 0 -8px; font-size: 16px; font-weight: 600; }
 .section-sub { margin: 0 0 -8px; color: var(--ink-3); font-size: 13px; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.chart-wrap { position: relative; width: 100%; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.chart-wrap { position: relative; width: 100%; min-width: 0; }
 .h-260 { height: 260px; }
 .h-420 { height: 420px; }
 .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 12px; font-size: 12px; color: var(--ink-3); }
