@@ -143,6 +143,28 @@ svg { stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round
 .kpi .k { color: var(--ink-3); font-weight: 500; }
 .kpi .v { margin-top: 4px; font-size: 28px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
 
+/* подсказка на KPI-карточке: тёмный «тултип» по наведению или фокусу (на телефоне — по нажатию) */
+.kpi { position: relative; }
+.kpi .k { padding-right: 20px; }
+.kpi:focus { outline: none; }
+.kpi:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.kpi-info {
+  position: absolute; top: 12px; right: 12px; width: 16px; height: 16px;
+  border: 1px solid var(--line-2); border-radius: 50%;
+  color: var(--ink-3); font-size: 10px; font-weight: 600; line-height: 14px; text-align: center;
+}
+.kpi:hover .kpi-info, .kpi:focus .kpi-info { color: var(--accent); border-color: var(--accent); }
+.kpi[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute; left: 0; top: calc(100% + 8px); z-index: 30;
+  width: max-content; max-width: 280px; padding: 10px 12px; border-radius: 8px;
+  background: #181D27; color: #fff; font-size: 12px; font-weight: 400; line-height: 1.45;
+  box-shadow: 0 8px 24px rgba(10, 13, 18, .2);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity .15s .1s, visibility .15s .1s;
+}
+.kpi[data-tip]:hover::after, .kpi[data-tip]:focus::after { opacity: 1; visibility: visible; }
+
 /* ---------- панели и таблица ---------- */
 .panel { min-width: 0; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-xs); }
 .panel-head { padding: 18px 20px; border-bottom: 1px solid var(--line); }
@@ -181,6 +203,7 @@ svg { stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round
 .section-title { margin: 8px 0 -8px; font-size: 16px; font-weight: 600; }
 .section-sub { margin: 0 0 -8px; color: var(--ink-3); font-size: 13px; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.grid-2 > .panel:last-child:nth-child(odd) { grid-column: 1 / -1; }   /* одинокий последний график — на всю ширину */
 .chart-wrap { position: relative; width: 100%; min-width: 0; }
 .h-260 { height: 260px; }
 .h-420 { height: 420px; }

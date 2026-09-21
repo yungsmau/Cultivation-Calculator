@@ -193,10 +193,10 @@
     weight: 2.5,
     conv: 1.5,
     posadka: 50000,
-    r06: 35,
-    r724: 35,
-    r2534: 35,
-    r3542: 35,
+    r06: 35.89,
+    r724: 31.98,
+    r2534: 29.49,
+    r3542: 28.54,
   };
   const DEFAULTS = { ...S }; // для кнопки «Сбросить» (без 'ref': это вид, а не параметр расчёта)
   S.ref = 0; // показывать ли справочные значения кросса
@@ -321,17 +321,18 @@
     return b;
   }
 
-  // KPI-карточка: иконка в рамке, подпись, крупное значение
-  function kpi(id, label, iconName) {
+  // KPI-карточка: иконка в рамке, подпись, крупное значение; tip — подсказка при наведении
+  function kpi(id, label, iconName, tip) {
     const v = el("div", { class: "v" }, "—");
     cards[id] = v;
     const ico = el("div", { class: "kpi-ico" });
     ico.append(icon(iconName));
     return el(
       "div",
-      { class: "kpi" },
+      { class: "kpi", "data-tip": tip, tabindex: "0" },
       ico,
       el("div", {}, el("div", { class: "k" }, label), v),
+      el("span", { class: "kpi-info", "aria-hidden": "true" }, "i"),
     );
   }
 
@@ -386,7 +387,7 @@
           }),
         ),
         section(
-          "Цены рецептов, ₽/кг",
+          "Цены рецептов, руб./кг",
           ...GROUPS.map((g) =>
             slider({
               key: RECIPE_KEY[g.id],
@@ -408,10 +409,30 @@
       const kpis = el(
         "div",
         { class: "kpis" },
-        kpi("idx-last", "Индекс стоимости", "trend"),
-        kpi("meat-last", "Мясо, кг", "box"),
-        kpi("prog", "Корм. программа, ₽/кг", "coins"),
-        kpi("total-cost", "Стоимость корма, ₽", "wallet"),
+        kpi(
+          "idx-last",
+          "Индекс стоимости, руб./кг",
+          "trend",
+          "Стоимость корма на 1 кг живой массы в день убоя, руб./кг: Конверсия × Цена рецепта группы, в которую попадает убой.",
+        ),
+        kpi(
+          "meat-last",
+          "Живой вес, кг",
+          "box",
+          "Живая масса всего поголовья в день убоя: Посадка × Сохранность на день убоя × Вес головы.",
+        ),
+        kpi(
+          "prog",
+          "Корм. программа, руб./кг",
+          "coins",
+          "Средневзвешенная цена 1 кг корма за весь период: Стоимость корма ÷ Расход корма (кг) по всем возрастным группам. Учитывает, сколько корма съедено в каждой группе, а не просто среднее цен рецептов.",
+        ),
+        kpi(
+          "total-cost",
+          "Стоимость корма, руб.",
+          "wallet",
+          "Стоимость корма на всё поголовье до дня убоя: Сумма по возрастным группам (Расход корма × Цена рецепта).",
+        ),
       );
 
       // --- графики
@@ -428,13 +449,13 @@
           `Голов с учётом сохранности: ${fmt(s.heads, 0)}`,
           `Корм в группе к этому дню: ${fmt(s.feedKgInGroup, 0)} кг`,
           withCost ? `Стоимость корма нараст.: ${fmt(s.cost, 0)} ₽` : null,
-          `Мясо: ${fmt(s.meat, 0)} кг`,
+          `Живой вес: ${fmt(s.meat, 0)} кг`,
         ].filter((x) => x !== null);
       };
       const tip = (i) => tipLines(i, true);
       const tipNoCost = (i) => tipLines(i, false);
       model.chIdx = makeChart(cIdx, {
-        label: "Индекс стоимости",
+        label: "Индекс стоимости, руб./кг",
         dec: 2,
         tooltipExtra: tip,
       });
@@ -444,7 +465,7 @@
         tooltipExtra: tip,
       });
       model.chCost = makeChart(cCost, {
-        label: "Стоимость корма, ₽",
+        label: "Стоимость корма, руб",
         dec: 0,
         bands: true,
         tooltipExtra: tipNoCost,
@@ -466,11 +487,11 @@
       const chartsRow = el(
         "div",
         { class: "grid-2" },
-        chartPanel("Индекс стоимости выращивания", cIdx, "h-260"),
+        chartPanel("Индекс стоимости выращивания, руб./кг", cIdx, "h-260"),
         chartPanel("Вес головы, г", cW, "h-260"),
       );
       const costPanel = chartPanel(
-        "Стоимость корма нарастающим итогом, ₽",
+        "Стоимость корма нарастающим итогом, руб.",
         cCost,
         "h-420",
         legend,
@@ -479,7 +500,7 @@
       // --- справочные значения кросса (в Power BI — скрытая группа по кнопке «Подсказка»)
       const refDefs = [
         {
-          title: "Индекс стоимости выращивания — КРОСС",
+          title: "Индекс стоимости выращивания, руб./кг — КРОСС",
           label: "Индекс стоимости (кросс)",
           dec: 2,
           key: "index",
@@ -490,6 +511,12 @@
           label: "Живая масса, г",
           dec: 0,
           key: "mass",
+        },
+        {
+          title: "Суточный привес, г — КРОСС",
+          label: "Суточный привес, г",
+          dec: 0,
+          key: "gain",
         },
         {
           title: "Конверсия корма — КРОСС",
@@ -573,8 +600,8 @@
                 "tr",
                 {},
                 el("th", {}, "Возрастная группа"),
-                el("th", { class: "num" }, "Цена, ₽/кг"),
-                el("th", { class: "num" }, "Корм, кг"),
+                el("th", { class: "num" }, "Цена, руб./кг"),
+                el("th", { class: "num" }, "Потребление корма, кг"),
                 el("th", { class: "num" }, "Стоимость, ₽"),
               ),
             ),
@@ -704,6 +731,7 @@
     const page = PAGES.find((p) => p.id === id) || PAGES[0];
     $("#page-title").textContent = page.title;
     $("#page-sub").textContent = page.sub;
+    $(".pagehead").classList.toggle("hidden", PAGES.lenght < 2);
     document
       .querySelectorAll("#tabs button")
       .forEach((b) =>

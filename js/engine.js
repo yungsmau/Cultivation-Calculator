@@ -45,6 +45,7 @@
     const feedCum = (d) => (row(d) ? row(d).feedCum : null);
     const crossConv = (d) => (row(d) ? row(d).conv : null);
     const groupOf = (d) => (row(d) ? row(d).group : null);
+    const gain = (d) => (row(d) ? row(d).gain : null);
 
     const surv = (d) => (survByDay.has(d) ? survByDay.get(d) / 100 : null);
 
@@ -97,6 +98,7 @@
         day: d,
         index: indexByActualPrice(d, prices),
         mass: mass(d),
+        gain: gain(d),
         conv: crossConv(d),
         surv: survByDay.has(d) ? survByDay.get(d) : null,
       }));
@@ -143,7 +145,7 @@
         return sumNonNull(terms);
       };
 
-      // Мясо, кг
+      // Живой вес, кг
       const meat = (d) => (d > U ? null : mul(heads(d), divide(w(d), 1000)));
 
       // Корм, съеденный текущей группой к дню dб кг на все поголовье (для подсказки)
