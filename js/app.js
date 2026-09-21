@@ -731,7 +731,7 @@
     const page = PAGES.find((p) => p.id === id) || PAGES[0];
     $("#page-title").textContent = page.title;
     $("#page-sub").textContent = page.sub;
-    $(".pagehead").classList.toggle("hidden", PAGES.lenght < 2);
+    $(".pagehead").classList.toggle("hidden", PAGES.length < 2);
     document
       .querySelectorAll("#tabs button")
       .forEach((b) =>
